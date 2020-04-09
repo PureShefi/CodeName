@@ -1,10 +1,8 @@
-var socket = io();
+// Validate currect login
+session_id = null;
+GetSessionId();
 
-session_id = sessionStorage.getItem('sessionId');
-if (session_id == null)
-{
-    window.location = "/register";
-}
+var socket = io('', {'sync disconnect on unload': true,  query: "session_id=" + session_id});
 
 // Make sure that we are connected
 cardColors = ["brown lighten-3","blue-grey darken-4", "blue", "red"]
@@ -25,8 +23,8 @@ socket.on('state', function(gameState) {
         return;
     }
 
-    ShowWords(gameState.words);
     ShowPlayers(gameState.players);
+    ShowWords(gameState.words);
     ShowCurrentTurnBanner(gameState);
     ChangeScore(gameState.words);
     prevState = gameState.turn
@@ -74,11 +72,18 @@ function ShowListOfPlayers(teams, color)
     teams[color].forEach(function(player){
         if (player.ismaster)
         {
+            if (player.session_id == session_id)
+                gameMaster = true
+
             teamStr += '<li class="collection-item active ' + color + '">' + player.name + '</li>'
         }
         else
         {
-            teamStr += '<li class="collection-item">' + player.name + '</li>'
+            boxColor = ""
+            if (player.session_id == session_id)
+                boxColor = "lime lighten-3 black-text"
+
+            teamStr += '<li class="collection-item ' + boxColor + '">' + player.name + '</li>'
         }
     })
 
@@ -143,7 +148,7 @@ function ChangeScore(words)
     {
         if (words[i].state != "hidden")
             continue;
-        
+
         if (words[i].color == COLORS.BLUE)
             blueCardsLeft += 1;
 
@@ -159,4 +164,22 @@ function ChangeScore(words)
 
     if (redCardsLeft == 0)
         ChangeBackgroundColor("red lighten-4")
+}
+
+function GetSessionId()
+{
+    session_id = sessionStorage.getItem('sessionId');
+    if (session_id == null)
+    {
+        window.location = "/register";
+    }
+
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", "/validate/" + session_id, false );
+    xmlHttp.send( null );
+    if (xmlHttp.responseText != "true")
+    {
+        window.location = "/register";
+    }
+    console.log(xmlHttp.responseText);
 }

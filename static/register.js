@@ -1,11 +1,16 @@
-var socket = io();
-
-socket.on("set-session-acknowledgement", function(data) {
-    sessionStorage.setItem('sessionId', data.sessionId);
-    window.location = "/";
-})
-
 function JoinGame()
 {
-    socket.emit('register', document.getElementById("name").value)
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", "/register/" + document.getElementById("name").value, false);
+    xmlHttp.send( null );
+    if (xmlHttp.responseText == "0")
+    {
+        alert("Failed registering, please try againg later");
+        return false;
+    }
+
+    // Remove the " at the beggining and end
+    cleanSession = xmlHttp.response.substring(1, xmlHttp.response.length-1)
+    sessionStorage.setItem('sessionId', cleanSession);
+    window.location = "/";
 }

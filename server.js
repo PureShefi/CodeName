@@ -22,15 +22,12 @@ app.get('/register', function(request, response) {
   response.sendFile(path.join(__dirname, 'register.html'));
 });
 
+app.get('/register/:name', function(request, response) {
+    response.json(AddPlayer(request.params.name));
+});
+
 app.get('/validate/:id', function(request, response) {
-    if (ValidateSession(request.params.id))
-    {
-        response.redirect('/');
-    }
-    else
-    {
-        response.redirect('/register');
-    }
+    response.json(ValidateSession(request.params.id));
 });
 
 server.listen(5000, function() {
@@ -45,36 +42,40 @@ var gameState = {
 };
 
 io.on('connection', function(socket) {
-  socket.on('register', function(data) {
-    AddPlayer(socket, data)
-  });
+    if (socket.handshake.query.session_id == undefined)
+        return
 
-  socket.on('chose word', SelectWord);
-  socket.on('end turn', EndTurn);
-  socket.on('reset game', ResetGame);
+    socket.session_id = socket.handshake.query.session_id
+    socket.on('chose word', SelectWord);
+    socket.on('end turn', EndTurn);
+    socket.on('reset game', ResetGame);
+    socket.on('disconnect', function(){
+        RemovePlayer(socket.session_id);
+    });
 });
 
 setInterval(function() {
   io.sockets.emit('state', gameState);
 }, 1000 / 5);
 
-function SelectWord(data)
+function PlayerTeamTurn(session_id)
 {
-    // TODO: add check that it is the correct user turn
-    correctPlayer = false;
     for (var i = 0; i < gameState.players[gameState.side].length; i++)
     {
-        if (gameState.players[gameState.side][i].session_id == data.player)
+        if (gameState.players[gameState.side][i].session_id == session_id)
         {
-            correctPlayer = true;
-            break;
+            return true;
         }
     }
 
-/*    if (!correctPlayer)
+    return false;
+}
+function SelectWord(data)
+{
+    if (!PlayerTeamTurn(data.player))
     {
         return;
-    }*/
+    }
 
     // Change selected word to visible
     for (var i = 0; i < gameState.words.length; i++)
@@ -115,18 +116,25 @@ function GetWords()
     return WordFunctions.Shuffle(wordDict);
 }
 
-function AddPlayer(socket, name)
+function AddPlayer(name)
 {
     var session_id = randomString(); //generating the sessions_id and then binding that socket to that sessions 
-    gameState.players.red.push({"name": name, "ismaster" : false, "session_id": session_id})
+    
+    // Add player to the team with less people
+    color = "red"
+    if (gameState.players.red.length > gameState.players.blue.length)
+        color = "blue"
 
-    socket.room = session_id;
-    socket.join(socket.room, function(res)
-    {
-        console.log("joined successfully")
-        socket.emit("set-session-acknowledgement", { sessionId: session_id })
-    });
+    // If he is the first player in the team make him the master
+    ismaster = false;
+    if (gameState.players[color].length == 0)
+        ismaster = true
 
+
+    gameState.players[color].push({"name": name, "ismaster" : ismaster, "session_id": session_id})
+
+    gameState.turn += 1
+    return session_id;
 }
 
 function randomString(size = 21) {  
@@ -170,6 +178,11 @@ function ResetGame(data)
 
 function EndTurn(data)
 {
+    if (!PlayerTeamTurn(data.player))
+    {
+        return;
+    }
+    
     gameState.turn += 1
 
     // Logic for turn sides
@@ -181,4 +194,30 @@ function EndTurn(data)
     {
         gameState.side = "red";
     }
+}
+
+function RemovePlayer(session_id)
+{
+    gameState.turn += 1
+
+    // Check if user is the game
+    for (var i = 0; i < gameState.players["red"].length; i++)
+    {
+        if (gameState.players["red"][i].session_id == session_id)
+        {
+            gameState.players["red"].splice(i, 1)
+            return true;
+        }
+    }
+
+    for (var i = 0; i < gameState.players["blue"].length; i++)
+    {
+        if (gameState.players["blue"][i].session_id == session_id)
+        {
+            gameState.players["blue"].splice(i, 1)
+            return true;
+        }
+    }
+
+    return false;
 }
