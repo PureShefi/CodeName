@@ -39,6 +39,7 @@ var gameState = {
     "players" : {"red":[], "blue":[]},
     "turn" : 0,
     "side" : "red",
+    "bombed" : false
 };
 
 io.on('connection', function(socket) {
@@ -60,6 +61,12 @@ setInterval(function() {
 
 function PlayerTeamTurn(session_id)
 {
+    // Don't allow to do anything in case of endgame
+    if (gameSystem.bombed)
+    {
+        return false;
+    }
+
     for (var i = 0; i < gameState.players[gameState.side].length; i++)
     {
         if (gameState.players[gameState.side][i].session_id == session_id)
@@ -86,7 +93,12 @@ function SelectWord(data)
             gameState.words[i].state = "visible";
             gameState.turn += 1
 
-            if (gameState.side == "red" && gameState.words[i].color != 3)
+            if (gameState.words[i].color == 1)
+            {
+                gameState.bombed = true;
+                EndTurn();
+            }
+            else if (gameState.side == "red" && gameState.words[i].color != 3)
             {
                 EndTurn();
             }
@@ -169,20 +181,17 @@ function ValidateSession(id)
 
 function ResetGame(data)
 {
-    currentPlayers = gameState.players
-    gameState = {
-        "words" : GetWords(),
-        "players" : currentPlayers,
-        "turn" : 0,
-        "side" : "red"
-    };
+    gameState.words = GetWords()
+    gameState.turn = 0
+    gameState.bombed = false
+    gameState.side = "red"
 
     io.sockets.emit('new game', {turn: 0});
 }
 
-function EndTurn(data)
+function EndTurn(data = undefined)
 {
-    if (!PlayerTeamTurn(data.player))
+    if (data != undefined && !PlayerTeamTurn(data.player))
     {
         return;
     }

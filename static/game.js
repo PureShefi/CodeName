@@ -18,24 +18,31 @@ const COLORS = {
 
 socket.on('state', function(gameState) {
     // Skip if no changes needed
-    if (prevState > gameState.turn)
+    if (prevState >= gameState.turn)
     {
         return;
     }
+    console.log(prevState, gameState.turn);
 
     ShowPlayers(gameState.players);
     ShowWords(gameState.words);
     ShowCurrentTurnBanner(gameState);
     ChangeScore(gameState.words);
-    prevState = gameState.turn
+
+    // Instante win if bomb was clicked
+    if (gameState.bombed == true)
+    {
+        ChangeBackgroundColor(gameState.side + " lighten-4")
+    }
+
     document.getElementById("body").style.display = "";
+    prevState = gameState.turn;
 });
 
 socket.on('new game', function(){
     ChangeBackgroundColor("grey lighten-3")
     prevState = -1
 })
-
 
 function GetCardStringFromWord(word, newRow)
 {
@@ -47,6 +54,15 @@ function GetCardStringFromWord(word, newRow)
         wordColor = "grey lighten-2";
         textColor = "";
     }
+    else if (gameMaster == true)
+    {
+        // Allow game master to see diffs more easily 
+        if (word.state == "hidden")
+            wordColor = wordColor + " lighten-2"
+        else
+            wordColor = "darken-3 " + wordColor
+    }
+
 
     cardStr = ' \
     <div class="col fifth-size"> \
@@ -76,24 +92,24 @@ function ShowListOfPlayers(teams, color)
 {
     teamStr = '<li class="collection-header"><h4>' + color.toUpperCase() + ' TEAM</h4></li>'
     teams[color].forEach(function(player){
+        gameMasterBorder = ""
+        starIcon = ""
+
+        // Add color if it is the game master
         if (player.ismaster)
         {
-            if (player.session_id == session_id)
-            {
-                gameMaster = true
-                bannerColor = color + " black-text"
-            }
-
-            teamStr += '<li class="collection-item active ' + bannerColor + '">' + player.name + '</li>'
+            gameMasterBorder = " active"
         }
-        else
+
+        // Add star if it is the current user
+        if (player.session_id == session_id)
         {
-            boxColor = ""
-            if (player.session_id == session_id)
-                boxColor = "lime lighten-3 black-text"
-
-            teamStr += '<li class="collection-item ' + boxColor + '">' + player.name + '</li>'
+            starIcon = ' <i class="material-icons" style="font-size: inherit">star</i> '
+            if (player.ismaster)
+                gameMaster = true
         }
+
+        teamStr += '<li class="collection-item ' + color  + gameMasterBorder + '">' + starIcon + player.name + '</li>'
     })
 
     teamList = document.getElementById(color +"-team");
@@ -166,10 +182,10 @@ function ChangeScore(words)
     document.getElementById("red-score").innerHTML = redCardsLeft;
 
     if (blueCardsLeft == 0)
-        ChangeBackgroundColor("blue lighten-4")
+        ChangeBackgroundColor("blue lighten-3")
 
     if (redCardsLeft == 0)
-        ChangeBackgroundColor("red lighten-4")
+        ChangeBackgroundColor("red lighten-3")
 }
 
 function GetSessionId()
