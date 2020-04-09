@@ -1,5 +1,8 @@
+var session_id = null;
+var gameMaster = false;
+var prevState = -1;
+
 // Validate currect login
-session_id = null;
 GetSessionId();
 
 var socket = io('', {'sync disconnect on unload': true,  query: "session_id=" + session_id});
@@ -13,12 +16,9 @@ const COLORS = {
     RED : 3
 }
 
-var gameMaster = false;
-
-prevState = -1
 socket.on('state', function(gameState) {
     // Skip if no changes needed
-    if (prevState == gameState.turn)
+    if (prevState > gameState.turn)
     {
         return;
     }
@@ -30,6 +30,12 @@ socket.on('state', function(gameState) {
     prevState = gameState.turn
     document.getElementById("body").style.display = "";
 });
+
+socket.on('new game', function(){
+    ChangeBackgroundColor("grey lighten-3")
+    prevState = -1
+})
+
 
 function GetCardStringFromWord(word, newRow)
 {
@@ -73,9 +79,12 @@ function ShowListOfPlayers(teams, color)
         if (player.ismaster)
         {
             if (player.session_id == session_id)
+            {
                 gameMaster = true
+                bannerColor = color + " black-text"
+            }
 
-            teamStr += '<li class="collection-item active ' + color + '">' + player.name + '</li>'
+            teamStr += '<li class="collection-item active ' + bannerColor + '">' + player.name + '</li>'
         }
         else
         {
@@ -122,15 +131,12 @@ function ChangeBackgroundColor(color)
 
 function ResetGame()
 {
-    ChangeBackgroundColor("grey lighten-3")
-    prevState = -1
     socket.emit('reset game', {endgame: true})
 }
 
 function EndTurn()
 {
-    // TODO: Add option to validate currect user ends the turn
-    socket.emit('end turn', null)
+    socket.emit('end turn', {"player": session_id})
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -172,6 +178,7 @@ function GetSessionId()
     if (session_id == null)
     {
         window.location = "/register";
+        return;
     }
 
     var xmlHttp = new XMLHttpRequest();
@@ -180,6 +187,6 @@ function GetSessionId()
     if (xmlHttp.responseText != "true")
     {
         window.location = "/register";
+        return;
     }
-    console.log(xmlHttp.responseText);
 }

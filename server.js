@@ -70,6 +70,7 @@ function PlayerTeamTurn(session_id)
 
     return false;
 }
+
 function SelectWord(data)
 {
     if (!PlayerTeamTurn(data.player))
@@ -142,6 +143,7 @@ function randomString(size = 21) {
     .randomBytes(size)
     .toString('base64')
     .slice(0, size)
+    .replace("/", "-")
 }
 
 function ValidateSession(id)
@@ -174,6 +176,8 @@ function ResetGame(data)
         "turn" : 0,
         "side" : "red"
     };
+
+    io.sockets.emit('new game', {turn: 0});
 }
 
 function EndTurn(data)
@@ -182,7 +186,7 @@ function EndTurn(data)
     {
         return;
     }
-    
+
     gameState.turn += 1
 
     // Logic for turn sides
@@ -199,7 +203,6 @@ function EndTurn(data)
 function RemovePlayer(session_id)
 {
     gameState.turn += 1
-
     // Check if user is the game
     for (var i = 0; i < gameState.players["red"].length; i++)
     {
