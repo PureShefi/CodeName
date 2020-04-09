@@ -1,0 +1,29 @@
+.card {
+  transition: 0.3s;
+}
+
+/* On mouse-over, add a deeper shadow */
+.clickable:hover {
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+
+.collection{
+    border: none;
+}
+
+.display-block{
+    display: block;
+}
+
+body{
+    transition: 0.3s;
+    overflow: hidden;
+}
+
+.fifth-size{
+    width: 20%;
+}
+
+.card .card-content{
+    padding: 8%;
+}

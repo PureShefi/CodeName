@@ -1,0 +1,37 @@
+
+<html>
+    <head>
+        <title>A Multiplayer Game</title>
+        <!-- Compiled and minified CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <link rel="stylesheet" href="/static/main.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        <!-- Compiled and minified JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+                
+        <script src="/socket.io/socket.io.js"></script>
+    </head>
+    <body class="grey lighten-3" style="overflow: hidden;">
+        <div class="row" style="position: absolute;width: 100vw; top:50%; transform: translateY(-50%);">
+          <div class="col s10 m4 offset-s1 offset-m4">
+            <div class="card">
+              <div class="card-image">
+                <img src="/static/agents.jpg">
+                <span class="card-title red-text">Name Code</span>
+                <a class="btn-floating halfway-fab waves-effect waves-light red" onclick="JoinGame()"><i class="material-icons">send</i></a>
+              </div>
+              <div class="card-content">
+                <div class="input-field">
+                    <i class="material-icons prefix">account_circle</i>
+                    <input id="name" type="text" class="validate">
+                    <label for="name">Name</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    </body>
+    <script src="/static/register.js"></script>
+</html>
