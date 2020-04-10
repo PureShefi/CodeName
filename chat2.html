@@ -1,0 +1,46 @@
+
+<html>
+    <head>
+        <title>A Multiplayer Game</title>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+        <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
+    </head>
+    <body class="grey lighten-3">
+        b
+
+        <button onclick="SendHi()">hi</button>
+        <button onclick="Call()">call</button>
+    </body>
+    <script>
+        var peer = new Peer("asd346g5325w35ncxngfd5"); 
+        console.log(peer);
+
+        function Call()
+        {
+           navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+           navigator.getUserMedia({audio: true}, function(stream) {
+             var call = peer.call('asdas53zv57686sdg', stream);
+             call.on('stream', function(remoteStream) {
+               console.log(remoteStream);
+             });
+           }, function(err) {
+             console.log('Failed to get local stream' ,err);
+           }); 
+        }
+
+
+        function SendHi()
+        {
+            var conn = peer.connect('asdas53zv57686sdg');
+            // on open will be launch when you successfully connect to PeerServer
+            conn.on('open', function(){
+              // here you have conn.id
+              conn.send('hi!');
+            });
+        }
+
+
+    </script>
+</html>

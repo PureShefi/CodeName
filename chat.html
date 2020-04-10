@@ -3,10 +3,41 @@
     <head>
         <title>A Multiplayer Game</title>
         <script src="/socket.io/socket.io.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+        <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
     </head>
     <body class="grey lighten-3">
         a
 
     </body>
-    <script src="/static/chat.js"></script>
+    <script>
+        var peer = new Peer("asdas53zv57686sdg"); 
+        console.log(peer);
+
+        var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        peer.on('call', function(call) {
+          navigator.getUserMedia({audio: true}, function(stream) {
+            call.answer(stream); // Answer the call with an A/V stream.
+            call.on('stream', function(remoteStream) {
+              playStream(remoteStream);
+            });
+          }, function(err) {
+            console.log('Failed to get local stream' ,err);
+          });
+        });
+
+        peer.on('connection', function(conn) {
+          conn.on('data', function(data){
+            // Will print 'hi!'
+            console.log(data);
+          });
+        });
+
+        function playStream(stream) {
+            console.log("chat started");
+          var audio = $('<audio autoplay />').appendTo('body');
+          audio[0].srcObject = stream;
+        }
+    </script>
 </html>

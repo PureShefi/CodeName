@@ -22,6 +22,12 @@ app.get('/', function(request, response) {
 app.get('/register', function(request, response) {
   response.sendFile(path.join(__dirname, 'register.html'));
 });
+app.get('/chat', function(request, response) {
+  response.sendFile(path.join(__dirname, 'chat.html'));
+});
+app.get('/chat2', function(request, response) {
+  response.sendFile(path.join(__dirname, 'chat2.html'));
+});
 
 app.get('/chat', function(request, response) {
   response.sendFile(path.join(__dirname, 'chat.html'));
