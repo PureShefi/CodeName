@@ -18,8 +18,13 @@ app.use('/static', express.static(__dirname + '/static'));
 app.get('/', function(request, response) {
   response.sendFile(path.join(__dirname, 'index.html'));
 });
+
 app.get('/register', function(request, response) {
   response.sendFile(path.join(__dirname, 'register.html'));
+});
+
+app.get('/chat', function(request, response) {
+  response.sendFile(path.join(__dirname, 'chat.html'));
 });
 
 app.get('/register/:name', function(request, response) {
@@ -50,6 +55,7 @@ io.on('connection', function(socket) {
     socket.on('chose word', SelectWord);
     socket.on('end turn', EndTurn);
     socket.on('reset game', ResetGame);
+    socket.on('voice message', BroadCastVoiceMessage);
     socket.on('disconnect', function(){
         RemovePlayer(socket.session_id);
     });
@@ -232,4 +238,10 @@ function RemovePlayer(session_id)
     }
 
     return false;
+}
+
+function BroadCastVoiceMessage(data)
+{
+    console.log(data);
+    io.sockets.emit('voice message', data);
 }
