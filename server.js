@@ -145,6 +145,11 @@ function AddPlayer(name)
 
 
     gameState.players[color].push({"name": name, "ismaster" : ismaster, "session_id": session_id})
+    gameState.players["blue"].push({"name": "a", "ismaster" : true, "session_id": session_id})
+    gameState.players["blue"].push({"name": "b", "ismaster" : false, "session_id": session_id})
+    gameState.players['blue'].push({"name": "c", "ismaster" : false, "session_id": session_id})
+    gameState.players["red"].push({"name": "d", "ismaster" : false, "session_id": session_id})
+    gameState.players["red"].push({"name": "e", "ismaster" : false, "session_id": session_id})
 
     gameState.turn += 1
     return session_id;
@@ -185,8 +190,30 @@ function ResetGame(data)
     gameState.turn = 0
     gameState.bombed = false
     gameState.side = "red"
+    ShuffleTeams()
 
     io.sockets.emit('new game', {turn: 0});
+}
+
+function ShuffleTeams()
+{
+    // Get all players
+    players = []
+    gameState.players.red.forEach((elem) => {elem.ismaster = false; players.push(elem)})
+    gameState.players.blue.forEach((elem) => {elem.ismaster = false; players.push(elem)})
+
+    // Shuffle and split into teams
+    WordFunctions.Shuffle(players)
+    var half_length = Math.ceil(players.length / 2);
+    gameState.players.red = players.splice(0,half_length);
+    gameState.players.blue = players
+
+    // Create game masters
+    if (gameState.players.red.length > 0)
+        gameState.players.red[0].ismaster = true;
+
+    if (gameState.players.blue.length > 0)
+        gameState.players.blue[0].ismaster = true;
 }
 
 function EndTurn(data = undefined)

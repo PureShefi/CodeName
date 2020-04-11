@@ -162,12 +162,6 @@ function EndTurn()
     socket.emit('end turn', {"player": session_id})
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('.modal');
-  var instances = M.Modal.init(elems);
-});
-
-
 function ChangeScore(words)
 {
     blueCardsLeft = 0;
@@ -215,6 +209,9 @@ function GetSessionId()
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('.sidenav');
-  var instances = M.Sidenav.init(elems, {"draggable": true});
+  var navs = document.querySelectorAll('.sidenav');
+  var instances = M.Sidenav.init(navs, {"draggable": true});
+
+  var modals = document.querySelectorAll('.modal');
+  var instances = M.Modal.init(modals);
 });
