@@ -6,12 +6,13 @@ var socketIO = require('socket.io');
 const Crypto = require('crypto');
 var WordFunctions = require('./words');
 
+SERVER_PORT = 8080
 
 var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 
-app.set('port', 5000);
+app.set('port', SERVER_PORT);
 app.use('/static', express.static(__dirname + '/static'));
 
 // Routing
@@ -30,8 +31,8 @@ app.get('/validate/:id', function(request, response) {
     response.json(ValidateSession(request.params.id));
 });
 
-server.listen(5000, function() {
-  console.log('Starting server on port 5000');
+server.listen(SERVER_PORT, function() {
+  console.log('Starting server on port '+ SERVER_PORT);
 });
 
 var gameState = {
@@ -131,7 +132,7 @@ function GetWords()
 
 function AddPlayer(name)
 {
-    var session_id = randomString(); //generating the sessions_id and then binding that socket to that sessions 
+    var session_id = RandomString(21); //generating the sessions_id and then binding that socket to that sessions 
     
     // Add player to the team with less people
     color = "red"
@@ -145,17 +146,12 @@ function AddPlayer(name)
 
 
     gameState.players[color].push({"name": name, "ismaster" : ismaster, "session_id": session_id})
-    gameState.players["blue"].push({"name": "a", "ismaster" : true, "session_id": session_id})
-    gameState.players["blue"].push({"name": "b", "ismaster" : false, "session_id": session_id})
-    gameState.players['blue'].push({"name": "c", "ismaster" : false, "session_id": session_id})
-    gameState.players["red"].push({"name": "d", "ismaster" : false, "session_id": session_id})
-    gameState.players["red"].push({"name": "e", "ismaster" : false, "session_id": session_id})
 
     gameState.turn += 1
     return session_id;
 }
 
-function randomString(size = 21) {  
+function RandomString(size) {  
   return Crypto
     .randomBytes(size)
     .toString('base64')
@@ -216,7 +212,7 @@ function ShuffleTeams()
         gameState.players.blue[0].ismaster = true;
 }
 
-function EndTurn(data = undefined)
+function EndTurn(data)
 {
     if (data != undefined && !PlayerTeamTurn(data.player))
     {
