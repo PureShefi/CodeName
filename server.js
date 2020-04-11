@@ -62,7 +62,7 @@ setInterval(function() {
 function PlayerTeamTurn(session_id)
 {
     // Don't allow to do anything in case of endgame
-    if (gameSystem.bombed)
+    if (gameState.bombed)
     {
         return false;
     }

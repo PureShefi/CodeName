@@ -44,7 +44,7 @@ socket.on('new game', function(){
     prevState = -1
 })
 
-function GetCardStringFromWord(word, newRow)
+function GetCardStringFromWord(word)
 {
     // Remove color if the word is hidden
     let textColor = "white-text";
@@ -64,9 +64,9 @@ function GetCardStringFromWord(word, newRow)
     }
 
 
-    cardStr = ' \
+    cardStr = '\
     <div class="col fifth-size"> \
-        <div class="card clickable waves-effect display-block waves-light ' + wordColor +'"> \
+        <div class="card clickable waves-effect waves-light word-card ' + wordColor +'""> \
             <div class="card-content ' + textColor + '" onclick="ChooseWord(\'' + word.text + '\')"> \
                 <span class="card-title center-align">' + word.text + '</span> \
             </div> \
@@ -83,7 +83,11 @@ function ShowWords(words)
     
     for (i = 0; i < words.length; i++)
     {
-        list += GetCardStringFromWord(words[i], i % 5 == 0);
+        if ((i) % 5 == 0){
+            list += "</div>"
+            list += "<div class='row words-row' >"
+        }
+        list += GetCardStringFromWord(words[i]);
     }
     table.innerHTML = list;
 }
@@ -98,7 +102,7 @@ function ShowListOfPlayers(teams, color)
         // Add color if it is the game master
         if (player.ismaster)
         {
-            gameMasterBorder = " active"
+            gameMasterBorder = color + " active"
         }
 
         // Add star if it is the current user
@@ -109,16 +113,19 @@ function ShowListOfPlayers(teams, color)
                 gameMaster = true
         }
 
-        teamStr += '<li class="collection-item ' + color  + gameMasterBorder + '">' + starIcon + player.name + '</li>'
+        teamStr += '<li class="collection-item ' + gameMasterBorder + '">' + starIcon + player.name + '</li>'
     })
 
     teamList = document.getElementById(color +"-team");
     teamList.innerHTML = teamStr;
+
+    return teamStr;
 }
 function ShowPlayers(players)
 {
-    ShowListOfPlayers(players, "red");
-    ShowListOfPlayers(players, "blue");
+    sideNavMenu = ShowListOfPlayers(players, "red");
+    sideNavMenu += ShowListOfPlayers(players, "blue");
+    document.getElementById("slide-out").innerHTML = sideNavMenu;
 }
 
 function ChooseWord(word)
@@ -206,3 +213,8 @@ function GetSessionId()
         return;
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  var elems = document.querySelectorAll('.sidenav');
+  var instances = M.Sidenav.init(elems, {"draggable": true});
+});

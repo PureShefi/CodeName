@@ -11,9 +11,9 @@
     display: block;
 }
 
-body{
+#game{
     transition: 0.3s;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .fifth-size{
@@ -22,4 +22,35 @@ body{
 
 .card .card-content{
     padding: 8%;
+    min-height: 80px;
+}
+
+.word-card{
+    width:100%;
+    margin: 0px;
+}
+
+
+.words-row .col{
+    padding: 0.25rem;
+    display: flex;
+}
+
+.words-row {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    display: flex;
+}
+
+.row{
+    margin-bottom: 10px;
+}
+
+@media only screen and (max-width: 992px){
+.card .card-content .card-title{
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    font-size: 20px;
+}
 }

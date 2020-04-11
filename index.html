@@ -3,6 +3,8 @@
     <head>
         <title>A Multiplayer Game</title>
         <!-- Compiled and minified CSS -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
         <link rel="stylesheet" href="/static/main.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -13,6 +15,20 @@
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body class="grey lighten-3" id="body">
+
+        <div class="navbar-fixed hide-on-large-only">
+          <nav>
+            <div class="nav-wrapper red">
+              <a href="#!" class="brand-logo">Code Name</a>
+              <ul class="left">
+                <li><a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a></li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+        <ul id="slide-out" class="sidenav"></ul>
+        
+        
         <div id="game">
             <div id="turn-info">
                 <div class="row">
@@ -28,53 +44,52 @@
             </div>
 
             <div class="row">
-                <ul class="col m2 hide-on-small-and-down collection with-header" id="red-team"></ul>
+                <ul class="col m2 hide-on-med-and-down collection with-header" id="red-team"></ul>
 
-                <div class="col s12 m8">
+                <div class="col s12 l8">
                     <div class="row" id="word-list">
                     </div>
                 </div>
 
-                <ul class="col m2 hide-on-small-and-down collection with-header" id="blue-team"></ul>
+                <ul class="col m2 hide-on-med-and-down collection with-header" id="blue-team"></ul>
+            </div>
+
+            <div id="score-board">
+                <div class="row">
+                    <div class="col s12 m3 offset-m2" id='current-turn'>
+                        <div class="card-panel red center-align white-text">
+                            Cards Left <b id="red-score">8</b>
+                        </div>
+                    </div>
+                    <div class="col s12 m2" id='current-turn'>
+                        <div class="card-panel brown lighten-3 center-align white-text waves-effect waves-light display-block" id="end-turn" onclick="EndTurn()">
+                            <b>End Turn</b>
+                        </div>
+                    </div>
+                    <div class="col s12 m3" id='current-turn'>
+                        <div class="card-panel blue center-align white-text"> 
+                            Cards Left <b id="blue-score">9</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fixed-action-btn">
+              <a class="btn-floating btn-large waves-effect waves-light red modal-trigger" href="#reset-game-modal"><i class="material-icons">replay</i></a>
+            </div>
+            
+            <!-- Modal Structure -->
+            <div id="reset-game-modal" class="modal bottom-sheet">
+              <div class="modal-content">
+                <h4>Are you sure?</h4>
+                <p>Starting a new game will wipe all progress made</p>
+              </div>
+                <div class="modal-footer">
+                 <a href="#!" class="modal-close waves-effect waves-red btn-flat">Disagree</a>
+                 <a href="#!" class="modal-close waves-effect waves-green btn-flat" onclick="ResetGame()">Agree</a>
+               </div>
             </div>
         </div>
-
-        <div id="score-board">
-            <div class="row">
-                <div class="col s12 m3 offset-m2" id='current-turn'>
-                    <div class="card-panel red center-align white-text">
-                        Cards Left <b id="red-score">8</b>
-                    </div>
-                </div>
-                <div class="col s12 m2" id='current-turn'>
-                    <div class="card-panel brown lighten-3 center-align white-text waves-effect waves-light display-block" id="end-turn" onclick="EndTurn()">
-                        <b>End Turn</b>
-                    </div>
-                </div>
-                <div class="col s12 m3" id='current-turn'>
-                    <div class="card-panel blue center-align white-text"> 
-                        Cards Left <b id="blue-score">9</b>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="fixed-action-btn">
-          <a class="btn-floating btn-large waves-effect waves-light red modal-trigger" href="#reset-game-modal"><i class="material-icons">replay</i></a>
-        </div>
-        
-        <!-- Modal Structure -->
-        <div id="reset-game-modal" class="modal bottom-sheet">
-          <div class="modal-content">
-            <h4>Are you sure?</h4>
-            <p>Starting a new game will wipe all progress made</p>
-          </div>
-            <div class="modal-footer">
-             <a href="#!" class="modal-close waves-effect waves-red btn-flat">Disagree</a>
-             <a href="#!" class="modal-close waves-effect waves-green btn-flat" onclick="ResetGame()">Agree</a>
-           </div>
-        </div>
-
         <script src="/static/game.js"></script>
     </body>
 </html>
