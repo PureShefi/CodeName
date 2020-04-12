@@ -56,7 +56,7 @@ function GetCardStringFromWord(word)
     }
     else if (gameMaster == true)
     {
-        // Allow game master to see diffs more easily 
+        // Allow game master to see diffs more easily
         if (word.state == "hidden")
             wordColor = wordColor + " lighten-2"
         else
@@ -80,7 +80,7 @@ function ShowWords(words)
 {
     table = document.getElementById("word-list");
     list = "";
-    
+
     for (i = 0; i < words.length; i++)
     {
         if ((i) % 5 == 0){

@@ -43,6 +43,8 @@ var gameState = {
     "bombed" : false
 };
 
+var unactivePlayers = []
+
 io.on('connection', function(socket) {
     if (socket.handshake.query.session_id == undefined)
         return
@@ -52,7 +54,13 @@ io.on('connection', function(socket) {
     socket.on('end turn', EndTurn);
     socket.on('reset game', ResetGame);
     socket.on('disconnect', function(){
-        RemovePlayer(socket.session_id);
+
+        // on disconnect add to unactive players
+        if (!unactivePlayers.includes(unactivePlayers))
+            unactivePlayers.push(socket.session_id)
+
+        // If he didn't come back after interval remove him
+        setTimeout(() => {RemovePlayer(socket.session_id)}, 10000);
     });
 });
 
@@ -132,8 +140,8 @@ function GetWords()
 
 function AddPlayer(name)
 {
-    var session_id = RandomString(21); //generating the sessions_id and then binding that socket to that sessions 
-    
+    var session_id = RandomString(21); //generating the sessions_id and then binding that socket to that sessions
+
     // Add player to the team with less people
     color = "red"
     if (gameState.players.red.length > gameState.players.blue.length)
@@ -151,7 +159,7 @@ function AddPlayer(name)
     return session_id;
 }
 
-function RandomString(size) {  
+function RandomString(size) {
   return Crypto
     .randomBytes(size)
     .toString('base64')
@@ -166,6 +174,8 @@ function ValidateSession(id)
     {
         if (gameState.players["red"][i].session_id == id)
         {
+            // Player is no longer unactive
+            unactivePlayers = unactivePlayers.filter(e => e != id)
             return true;
         }
     }
@@ -173,6 +183,8 @@ function ValidateSession(id)
     {
         if (gameState.players["blue"][i].session_id == id)
         {
+            // Player is no longer unactive
+            unactivePlayers = unactivePlayers.filter(e => e != id)
             return true;
         }
     }
@@ -186,6 +198,9 @@ function ResetGame(data)
     gameState.turn = 0
     gameState.bombed = false
     gameState.side = "red"
+
+    // Remove unactive players and shuffle the teams
+    unactivePlayers.forEach(RemovePlayer)
     ShuffleTeams()
 
     io.sockets.emit('new game', {turn: 0});
@@ -234,6 +249,12 @@ function EndTurn(data)
 
 function RemovePlayer(session_id)
 {
+    // Check if player is really inactive or accidently refreshed page
+    if (!unactivePlayers.includes(session_id))
+    {
+        return;
+    }
+
     gameState.turn += 1
     // Check if user is the game
     for (var i = 0; i < gameState.players["red"].length; i++)
