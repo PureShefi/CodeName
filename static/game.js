@@ -1,11 +1,11 @@
-var session_id = null;
+var sessionId = null;
 var gameMaster = false;
 var prevState = -1;
 
 // Validate currect login
 GetSessionId();
 
-var socket = io('', {'sync disconnect on unload': true,  query: "session_id=" + session_id});
+var socket = io('', {'sync disconnect on unload': true,  query: "sessionId=" + sessionId});
 
 // Make sure that we are connected
 cardColors = ["brown lighten-3","blue-grey darken-4", "blue", "red"]
@@ -22,7 +22,6 @@ socket.on('state', function(gameState) {
     {
         return;
     }
-    console.log(prevState, gameState.turn);
 
     ShowPlayers(gameState.players);
     ShowWords(gameState.words);
@@ -92,24 +91,30 @@ function ShowWords(words)
     table.innerHTML = list;
 }
 
-function ShowListOfPlayers(teams, color)
+function ShowListOfPlayers(players, color)
 {
     teamStr = '<li class="collection-header"><h4>' + color.toUpperCase() + ' TEAM</h4></li>'
-    teams[color].forEach(function(player){
+    players.forEach(function(player){
         gameMasterBorder = ""
         starIcon = ""
 
+        // We get one team at a time
+        if (player.team != color)
+        {
+            return;
+        }
+
         // Add color if it is the game master
-        if (player.ismaster)
+        if (player.isMaster)
         {
             gameMasterBorder = color + " active"
         }
 
         // Add star if it is the current user
-        if (player.session_id == session_id)
+        if (player.sessionId == sessionId)
         {
             starIcon = ' <i class="material-icons" style="font-size: inherit">star</i> '
-            if (player.ismaster)
+            if (player.isMaster)
                 gameMaster = true
         }
 
@@ -130,7 +135,7 @@ function ShowPlayers(players)
 
 function ChooseWord(word)
 {
-    socket.emit('chose word', {"word": word, "player": session_id})
+    socket.emit('chose word', {"word": word, "player": sessionId})
 }
 
 function ShowCurrentTurnBanner(gameState)
@@ -159,7 +164,7 @@ function ResetGame()
 
 function EndTurn()
 {
-    socket.emit('end turn', {"player": session_id})
+    socket.emit('end turn', {"player": sessionId})
 }
 
 function ChangeScore(words)
@@ -191,15 +196,15 @@ function ChangeScore(words)
 
 function GetSessionId()
 {
-    session_id = sessionStorage.getItem('sessionId');
-    if (session_id == null)
+    sessionId = sessionStorage.getItem('sessionId');
+    if (sessionId == null)
     {
         window.location = "/register";
         return;
     }
 
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", "/validate/" + session_id, false );
+    xmlHttp.open( "GET", "/validate/" + sessionId, false );
     xmlHttp.send( null );
     if (xmlHttp.responseText != "true")
     {
