@@ -32,8 +32,11 @@ class Game{
             return;
         }
 
-        // Change selected word to visible
-        this.words.Select(data.word)
+        // Change selected word to visible, return if is already selected
+        if (!this.words.Select(data.word))
+        {
+            return;
+        }
 
         // Get The word type
         var wordType = this.words.GetWordType(data.word)

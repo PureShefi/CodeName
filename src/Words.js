@@ -45,7 +45,16 @@ class Words{
         for (var i = 0; i < this.words.length; i++)
         {
             if (this.words[i].text == text)
+            {
+                // If we are already visible return false
+                if (this.words[i].state == "visible")
+                {
+                    return false;
+                }
+
                 this.words[i].state = "visible";
+                return true;
+            }
         }
     }
 

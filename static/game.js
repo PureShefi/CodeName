@@ -8,7 +8,7 @@ GetSessionId();
 var socket = io('', {'sync disconnect on unload': true,  query: "sessionId=" + sessionId});
 
 // Make sure that we are connected
-cardColors = ["brown lighten-3","blue-grey darken-4", "blue", "red"]
+cardColors = ["brown lighten-3","grey darken-4", "blue", "red"]
 const COLORS = {
     BROWN : 0,
     BLACK : 1,
@@ -46,27 +46,28 @@ socket.on('new game', function(){
 function GetCardStringFromWord(word)
 {
     // Remove color if the word is hidden
-    let textColor = "white-text";
     let wordColor = cardColors[word.color]
-    if (word.state == "hidden" && gameMaster == false)
+
+    // If it is hidden don't show the color
+    if (word.state == "hidden" && window.gameMaster == false)
     {
-        wordColor = "grey lighten-2";
-        textColor = "";
+        wordColor = "grey lighten-2 black-text";
     }
-    else if (gameMaster == true)
+
+    if (window.gameMaster)
     {
         // Allow game master to see diffs more easily
         if (word.state == "hidden")
             wordColor = wordColor + " lighten-2"
         else
-            wordColor = "darken-3 " + wordColor
+            wordColor = "darken-1 " + wordColor
     }
 
 
     cardStr = '\
-    <div class="col fifth-size"> \
+    <div class="col fifth-size white-text"> \
         <div class="card clickable waves-effect waves-light word-card ' + wordColor +'""> \
-            <div class="card-content ' + textColor + '" onclick="ChooseWord(\'' + word.text + '\')"> \
+            <div class="card-content" onclick="ChooseWord(\'' + word.text + '\')"> \
                 <span class="card-title center-align">' + word.text + '</span> \
             </div> \
         </div> \
@@ -114,8 +115,8 @@ function ShowListOfPlayers(players, color)
         if (player.sessionId == sessionId)
         {
             starIcon = ' <i class="material-icons" style="font-size: inherit">star</i> '
-            if (player.isMaster)
-                gameMaster = true
+            window.gameMaster = player.isMaster
+            console.log(window.gameMaster)
         }
 
         teamStr += '<li class="collection-item ' + gameMasterBorder + '">' + starIcon + player.name + '</li>'
@@ -135,6 +136,10 @@ function ShowPlayers(players)
 
 function ChooseWord(word)
 {
+    // Don't allow game masters to choose words
+    if (window.gameMaster)
+        return;
+
     socket.emit('chose word', {"word": word, "player": sessionId})
 }
 
