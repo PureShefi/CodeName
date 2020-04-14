@@ -67,6 +67,7 @@ io.on('connection', function(socket) {
         if (games[room] == undefined) return;
 
         games[room].EndTurn(data);
+        UpdateState(room);
     });
 
     socket.on('reset game', (data) => {

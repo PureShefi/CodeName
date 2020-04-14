@@ -70,7 +70,7 @@ class WordList{
     {
         if (!WordList.words)
         {
-            WordList.words = fs.readFileSync(path.join(__dirname, "word_list.txt")).toString().split("\r\n");
+            WordList.words = fs.readFileSync(path.join(__dirname, "word_list.txt")).toString().split("\n");
         }
 
         return WordList.words;

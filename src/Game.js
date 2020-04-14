@@ -81,7 +81,7 @@ class Game{
             return;
         }
 
-        this.side = (this.side + 1) % this.players.teams.length
+        this.side = (this.side + 1) % this.players.teams.length;
     }
 
     GetState()

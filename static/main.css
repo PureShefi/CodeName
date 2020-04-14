@@ -46,6 +46,10 @@
     margin-bottom: 10px;
 }
 
+#slide-out li{
+    padding-left: 10px;
+}
+
 @media only screen and (max-width: 992px){
 .card .card-content .card-title{
     word-wrap: break-word;

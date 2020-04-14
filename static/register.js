@@ -19,3 +19,19 @@ function JoinGame()
     sessionStorage.setItem('room', room);
     window.location = "/";
 }
+
+document.getElementById("room").addEventListener("keyup", function(event) {
+  // Number 13 is the "Enter" key on the keyboard
+  if (event.keyCode === 13) {
+    event.preventDefault();
+    JoinGame();
+  }
+});
+
+document.getElementById("name").addEventListener("keyup", function(event) {
+  // Number 13 is the "Enter" key on the keyboard
+  if (event.keyCode === 13) {
+    event.preventDefault();
+    JoinGame();
+  }
+});
