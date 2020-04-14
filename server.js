@@ -11,7 +11,8 @@ var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 
-var gameState = new Game();
+var games = {};
+
 app.set('port', SERVER_PORT);
 app.use('/static', express.static(__dirname + '/static'));
 
@@ -23,12 +24,23 @@ app.get('/register', function(request, response) {
   response.sendFile(path.join(__dirname, 'register.html'));
 });
 
-app.get('/register/:name', function(request, response) {
-    response.json(gameState.AddPlayer(request.params.name));
+app.get('/register/:room/:name', function(request, response) {
+    // Create the room if it doesn't exist
+    if (games[request.params.room] == undefined)
+        games[request.params.room] = new Game(request.params.room);
+
+    response.json(games[request.params.room].AddPlayer(request.params.name));
 });
 
-app.get('/validate/:id', function(request, response) {
-    response.json(gameState.ValidateSession(request.params.id));
+app.get('/validate/:room/:id', function(request, response) {
+    // Make sure game really exists
+    if (games[request.params.room] == undefined)
+    {
+        response.json(false)
+        return;
+    }
+
+    response.json(games[request.params.room].ValidateSession(request.params.id));
 });
 
 server.listen(SERVER_PORT, function() {
@@ -36,33 +48,53 @@ server.listen(SERVER_PORT, function() {
 });
 
 io.on('connection', function(socket) {
-    if (socket.handshake.query.sessionId == undefined)
+    if (socket.handshake.query.sessionId == undefined || socket.handshake.query.room == undefined)
         return
 
+    var room = socket.handshake.query.room
+    socket.join(room)
+
     socket.sessionId = socket.handshake.query.sessionId
+
     socket.on('chose word', (data) => {
-      gameState.SelectWord(data);
-      UpdateState();
+        if (games[room] == undefined) return;
+
+        games[room].SelectWord(data);
+        UpdateState(room);
     });
+
     socket.on('end turn', (data) => {
-      gameState.EndTurn(data);
-      UpdateState();
+        if (games[room] == undefined) return;
+
+        games[room].EndTurn(data);
     });
+
     socket.on('reset game', (data) => {
-      gameState.Reset(data);
-      io.sockets.emit("new game")
-      UpdateState();
+        if (games[room] == undefined) return;
+
+        games[room].Reset(data);
+        io.sockets.in(room).emit("new game");
+        UpdateState(room);
     });
 
     socket.on('disconnect', () => {
-        gameState.RemovePlayer(socket.sessionId)
-        UpdateState();
+        if (games[room] == undefined) return;
+
+        games[room].RemovePlayer(socket.sessionId, DeleteRoom)
+        UpdateState(room);
     });
 
-    UpdateState();
+    UpdateState(room);
 });
 
-function UpdateState()
+function UpdateState(room)
 {
-    io.sockets.emit('state', gameState.GetState());
+    if (games[room] == undefined) return;
+
+    io.sockets.in(room).emit('state', games[room].GetState());
+}
+
+function DeleteRoom(room)
+{
+    delete games[room];
 }

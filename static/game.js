@@ -1,11 +1,12 @@
 var sessionId = null;
 var gameMaster = false;
 var prevState = -1;
+var room = null;
 
 // Validate currect login
-GetSessionId();
+GetSessionIdAndRoom();
 
-var socket = io('', {'sync disconnect on unload': true,  query: "sessionId=" + sessionId});
+var socket = io('', {'sync disconnect on unload': true,  query: "sessionId=" + sessionId + "&room=" + room});
 
 // Make sure that we are connected
 cardColors = ["brown lighten-3","grey darken-4", "blue", "red"]
@@ -192,17 +193,18 @@ function ChangeScore(words)
         ChangeBackgroundColor("red lighten-3")
 }
 
-function GetSessionId()
+function GetSessionIdAndRoom()
 {
     sessionId = sessionStorage.getItem('sessionId');
-    if (sessionId == null)
+    room = sessionStorage.getItem('room');
+    if (sessionId == null || room == null)
     {
         window.location = "/register";
         return;
     }
 
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", "/validate/" + sessionId, false );
+    xmlHttp.open( "GET", "/validate/" + room + "/" + sessionId, false );
     xmlHttp.send( null );
     if (xmlHttp.responseText != "true")
     {

@@ -1,7 +1,11 @@
 function JoinGame()
 {
+    var name = document.getElementById("name").value.replace("/", "-")
+    var room = document.getElementById("room").value.replace("/", "-")
+    var params = room + "/" + name
+
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", "/register/" + document.getElementById("name").value, false);
+    xmlHttp.open( "GET", "/register/" + params, false);
     xmlHttp.send( null );
     if (xmlHttp.responseText == "0")
     {
@@ -12,5 +16,6 @@ function JoinGame()
     // Remove the " at the beggining and end
     cleanSession = xmlHttp.response.substring(1, xmlHttp.response.length-1)
     sessionStorage.setItem('sessionId', cleanSession);
+    sessionStorage.setItem('room', room);
     window.location = "/";
 }

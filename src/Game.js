@@ -2,12 +2,13 @@ const Words = require("./Words.js")
 const Players = require("./Players.js")
 
 class Game{
-    constructor()
+    constructor(room)
     {
         this.words = new Words()
         this.players = new Players(["red", "blue"]);
         this.side = 0
         this.bombed = false
+        this.room = room
     }
 
     PlayerTeamTurn(sessionId)
@@ -93,7 +94,7 @@ class Game{
         }
     }
 
-    RemovePlayer(sessionId)
+    RemovePlayer(sessionId, deleteFunc)
     {
         // on disconnect add to unactive players
         this.players.DisablePlayer(sessionId)
@@ -101,6 +102,12 @@ class Game{
         // If he didn't come back after interval remove him
         setTimeout(() => {
             this.players.Remove(sessionId);
+
+            // Delete room in case all players left
+            if (this.players.players.length == 0)
+            {
+            	deleteFunc(this.room)
+            }
         }, 5000);
     }
 
