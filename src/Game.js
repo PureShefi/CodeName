@@ -6,7 +6,6 @@ class Game{
     {
         this.words = new Words()
         this.players = new Players(["red", "blue"]);
-        this.turn = 0
         this.side = 0
         this.bombed = false
     }
@@ -56,8 +55,6 @@ class Game{
         {
             this.EndTurn();
         }
-
-        this.turn += 1
     }
 
     ValidateSession(sessionId)
@@ -71,7 +68,6 @@ class Game{
     {
         this.words.Reset()
         this.players.ShuffleTeams();
-        this.turn = 0
         this.side = 0
         this.bombed = false
     }
@@ -84,7 +80,6 @@ class Game{
             return;
         }
 
-        this.turn += 1
         this.side = (this.side + 1) % this.players.teams.length
     }
 
@@ -93,7 +88,6 @@ class Game{
         return {
             "words" : this.words.words,
             "players" : this.players.players,
-            "turn" : this.turn,
             "side" : this.players.teams[this.side],
             "bombed" : this.bombed
         }
@@ -107,7 +101,6 @@ class Game{
         // If he didn't come back after interval remove him
         setTimeout(() => {
             this.players.Remove(sessionId);
-            this.turn += 1;
         }, 5000);
     }
 

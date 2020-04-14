@@ -17,12 +17,6 @@ const COLORS = {
 }
 
 socket.on('state', function(gameState) {
-    // Skip if no changes needed
-    if (prevState >= gameState.turn)
-    {
-        return;
-    }
-
     ShowPlayers(gameState.players);
     ShowWords(gameState.words);
     ShowCurrentTurnBanner(gameState);
@@ -35,7 +29,6 @@ socket.on('state', function(gameState) {
     }
 
     document.getElementById("body").style.display = "";
-    prevState = gameState.turn;
 });
 
 socket.on('new game', function(){

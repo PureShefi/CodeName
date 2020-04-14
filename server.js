@@ -42,21 +42,27 @@ io.on('connection', function(socket) {
     socket.sessionId = socket.handshake.query.sessionId
     socket.on('chose word', (data) => {
       gameState.SelectWord(data);
+      UpdateState();
     });
     socket.on('end turn', (data) => {
       gameState.EndTurn(data);
+      UpdateState();
     });
     socket.on('reset game', (data) => {
       gameState.Reset(data);
       io.sockets.emit("new game")
+      UpdateState();
     });
 
     socket.on('disconnect', () => {
         gameState.RemovePlayer(socket.sessionId)
+        UpdateState();
     });
+
+    UpdateState();
 });
 
-setInterval(function() {
-  io.sockets.emit('state', gameState.GetState());
-}, 1000 / 5);
-
+function UpdateState()
+{
+    io.sockets.emit('state', gameState.GetState());
+}
